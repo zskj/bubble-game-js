@@ -7,57 +7,81 @@
     <meta name="keywords" content="泡泡游戏,Emoji,合成游戏,手机游戏">
     <title>🫧 泡泡游戏</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🫧 泡泡游戏</h1>
-            <p class="subtitle">对准位置投入 Emoji，相同的合成后获得分数</p>
-        </header>
-
         <div class="game-wrapper">
-            <!-- 分数显示栏 -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <label>分数</label>
-                    <span id="score" class="stat-value">0</span>
-                </div>
-                <div class="stat-item">
-                    <label>连击</label>
-                    <span id="combo" class="stat-value">0</span>
+            <!-- 标题 -->
+            <div class="header-frame">
+                <div class="frame-inner">
+                    <h1>泡泡游戏</h1>
+                    <div class="game-mode">- NORMAL -</div>
                 </div>
             </div>
 
-            <!-- Canvas 游戏区 -->
-            <div class="canvas-container">
-                <canvas id="gameCanvas" width="450" height="600"></canvas>
+            <!-- 主要游戏区域 -->
+            <div class="main-game-area">
+                <!-- Canvas 游戏区 -->
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="450" height="600"></canvas>
+                    <div id="chainDisplay" class="chain-display">0 Chain!</div>
+                    <div id="aimingIndicator" class="aiming-indicator">
+                        <div class="aiming-character"></div>
+                        <div class="aiming-triangle"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 游戏控制区 -->
+            <!-- 分数和设置 -->
+            <div class="score-settings-row">
+                <div class="score-frame">
+                    <div class="frame-inner">
+                        <div>得分: <span id="score">0</span>pt</div>
+                        <div>最高分: <b><span id="highScore">0</span>pt</b></div>
+                    </div>
+                </div>
+                <div class="settings-frame">
+                    <div class="frame-inner">
+                        <div><i class="ti ti-settings"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fusion Recipe -->
+            <div class="recipe-frame">
+                <div class="frame-inner">
+                    <div class="recipe-title">FUSION RECIPE</div>
+                    <div id="fusionRecipe" class="recipe-items"></div>
+                </div>
+            </div>
+
+            <!-- 控制区 -->
             <div class="controls-section">
-                <!-- 预览区 -->
-                <div class="preview-area">
-                    <label class="preview-label">下一个:</label>
-                    <div id="stockDisplay" class="stock-items">
-                        <div class="stock-item">🍎</div>
-                        <div class="stock-item">🍊</div>
-                        <div class="stock-item">🍋</div>
-                        <div class="stock-item">🍌</div>
+                <!-- 下一个道具 -->
+                <div class="stock-frame">
+                    <div class="frame-inner stock-inner">
+                        <div id="stockDisplay" class="stock-items"></div>
                     </div>
                 </div>
 
-                <!-- 操作区 -->
-                <div class="actions-area">
-                    <div class="position-selector">
-                        <label for="xSlider">位置:</label>
-                        <input id="xSlider" type="range" min="25" max="425" value="225" class="drop-slider">
-                        <span id="xValue" class="x-value">225</span>
+                <!-- 操作按钮 -->
+                <div class="button-frame">
+                    <div class="frame-inner">
+                        <button id="dropBtn" class="btn btn-catch">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">抓住</div>
+                        </button>
                     </div>
+                </div>
 
-                    <div class="button-group">
-                        <button id="dropBtn" class="btn btn-primary">投放</button>
-                        <button id="holdBtn" class="btn btn-secondary">Hold</button>
-                        <button id="restartBtn" class="btn btn-danger">重新开始</button>
+                <!-- Hold/取消按钮 -->
+                <div class="hold-frame">
+                    <div class="frame-inner">
+                        <button id="holdBtn" class="btn btn-cancel">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">取消</div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -73,7 +97,10 @@
                 <p><label>最终分数:</label> <strong id="finalScore">0</strong></p>
                 <p><label>最高连击:</label> <strong id="maxCombo">0</strong></p>
             </div>
-            <button id="modalRestartBtn" class="btn btn-primary btn-large">再来一局</button>
+            <button id="modalRestartBtn" class="btn btn-catch btn-large">
+                <div class="btn-icon"></div>
+                <div class="btn-text">再来一局</div>
+            </button>
         </div>
     </div>
 

@@ -1,70 +1,598 @@
 /* 全局 */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
 
 /* 容器 */
-.container { max-width: 500px; margin: 0 auto; padding: 20px; }
+.container {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 15px;
+}
 
-/* Header */
-header { text-align: center; margin-bottom: 30px; }
-header h1 { font-size: 32px; margin-bottom: 8px; }
-header p { color: #666; font-size: 14px; }
+/* Wooden Frame 通用样式 */
+.frame-inner {
+  background: #f5e6c8;
+  border: 3px solid #8b4513;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
 
-/* Canvas */
-#gameCanvas { display: block; background: white; border: 2px solid #ddd; margin: 20px auto; border-radius: 8px; }
+.frame-inner::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 1px solid #d4a574;
+  border-radius: 8px;
+  pointer-events: none;
+}
 
-/* 分数栏 */
-.stats-bar { display: flex; justify-content: space-around; margin-bottom: 20px; }
-.stat-item { text-align: center; }
-.stat-item label { display: block; font-size: 12px; color: #999; margin-bottom: 4px; }
-.stat-value { display: block; font-size: 28px; font-weight: bold; color: #333; }
+/* 标题帧 */
+.header-frame {
+  margin-bottom: 15px;
+}
+
+.header-frame .frame-inner {
+  text-align: center;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #fff8dc 0%, #f5e6c8 100%);
+}
+
+.header-frame h1 {
+  font-size: 24px;
+  color: #8b4513;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.game-mode {
+  font-size: 14px;
+  color: #a0522d;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+/* 主要游戏区域 */
+.main-game-area {
+  margin-bottom: 15px;
+}
+
+/* Canvas 容器 */
+.canvas-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #faf3e0;
+  border: 4px solid #8b4513;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#gameCanvas {
+  display: block;
+  background: #fff;
+  border-radius: 5px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 连击显示 */
+.chain-display {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff6b6b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  display: none;
+  pointer-events: none;
+  animation: chainPop 0.3s ease-out;
+}
+
+@keyframes chainPop {
+  0% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 瞄准指示器 */
+.aiming-indicator {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: left 0.1s ease-out;
+}
+
+.aiming-character {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
+  border: 3px solid #8b4513;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  margin: 0 auto;
+}
+
+.aiming-character::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 25%;
+  width: 15%;
+  height: 15%;
+  background: #333;
+  border-radius: 50%;
+  box-shadow: 25px 0 0 #333;
+}
+
+.aiming-character::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  height: 20%;
+  background: #ff6b6b;
+  border-radius: 50%;
+}
+
+.aiming-triangle {
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 24px solid #ff3d00;
+  margin: 5px auto 0;
+  position: relative;
+}
+
+.aiming-triangle::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 16px solid #ff7a00;
+}
+
+/* 分数和设置行 */
+.score-settings-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.score-frame {
+  flex: 1;
+}
+
+.score-frame .frame-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 14px;
+  color: #5d4e37;
+}
+
+.score-frame .frame-inner b {
+  color: #d35400;
+  font-size: 18px;
+}
+
+.settings-frame {
+  width: 50px;
+}
+
+.settings-frame .frame-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 50px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.settings-frame .frame-inner:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.settings-frame i {
+  font-size: 24px;
+  color: #8b4513;
+}
+
+/* Fusion Recipe */
+.recipe-frame {
+  margin-bottom: 15px;
+}
+
+.recipe-frame .frame-inner {
+  padding: 15px;
+}
+
+.recipe-title {
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #8b4513;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.recipe-items {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #8b4513 #f5e6c8;
+}
+
+.recipe-items::-webkit-scrollbar {
+  height: 6px;
+}
+
+.recipe-items::-webkit-scrollbar-track {
+  background: #f5e6c8;
+  border-radius: 3px;
+}
+
+.recipe-items::-webkit-scrollbar-thumb {
+  background: #8b4513;
+  border-radius: 3px;
+}
+
+.recipe-item {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.recipe-item img {
+  width: 28px;
+  height: 28px;
+  vertical-align: bottom;
+  display: inline-block;
+}
+
+.recipe-item .arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #8b4513;
+  margin-left: 2px;
+}
 
 /* 控制区 */
-.controls-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-.preview-area { margin-bottom: 20px; }
-.preview-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
-.stock-items { display: flex; gap: 10px; }
-.stock-item { width: 50px; height: 50px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 2px solid #e0e0e0; }
+/* 道具预览帧 */
+.stock-frame {
+  margin-bottom: 0;
+}
 
-.actions-area { }
+.stock-frame .frame-inner {
+  padding: 12px;
+  min-height: 80px;
+}
 
-.position-selector { margin-bottom: 20px; }
-.position-selector label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-.drop-slider { width: 100%; height: 8px; cursor: pointer; }
+.stock-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
 
-.button-group { display: flex; gap: 10px; }
-.btn { flex: 1; padding: 12px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-.btn-primary { background: #007AFF; color: white; }
-.btn-primary:active { opacity: 0.8; }
-.btn-secondary { background: #34C759; color: white; }
-.btn-secondary:active { opacity: 0.8; }
-.btn-danger { background: #FF3B30; color: white; }
-.btn-danger:active { opacity: 0.8; }
+.stock-items {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.stock-item {
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stock-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stock-item:first-child {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+  transform: scale(1.05);
+}
+
+/* 按钮帧 */
+.button-frame,
+.hold-frame {
+  margin-bottom: 0;
+}
+
+.button-frame .frame-inner,
+.hold-frame .frame-inner {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* 按钮样式 */
+.btn {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-catch {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: 2px solid #4a3f8a;
+}
+
+.btn-catch:active {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3d8a 100%);
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: 2px solid #d14056;
+}
+
+.btn-cancel:active {
+  background: linear-gradient(135deg, #e083eb 0%, #e0475c 100%);
+}
+
+.btn-large {
+  padding: 18px 32px;
+  font-size: 20px;
+}
+
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-text {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
 /* Modal */
-.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; z-index: 999; }
-.modal.hidden { display: none; }
-.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
-.modal-content { position: relative; background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 90%; }
-.modal-content h2 { font-size: 24px; margin-bottom: 20px; }
-.game-over-stats { margin-bottom: 30px; font-size: 16px; }
-.game-over-stats p { margin: 10px 0; }
-.game-over-stats label { color: #999; }
-.game-over-stats strong { font-size: 24px; color: #333; }
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  position: relative;
+  background: #f5e6c8;
+  border: 4px solid #8b4513;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  max-width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #8b4513;
+  font-weight: bold;
+}
+
+.game-over-stats {
+  margin-bottom: 30px;
+  font-size: 16px;
+  color: #5d4e37;
+}
+
+.game-over-stats p {
+  margin: 12px 0;
+}
+
+.game-over-stats label {
+  color: #8b4513;
+  margin-right: 8px;
+}
+
+.game-over-stats strong {
+  font-size: 24px;
+  color: #d35400;
+}
 
 /* 响应式 */
 @media (max-width: 767px) {
-  .container { padding: 15px; }
-  header h1 { font-size: 28px; }
-  #gameCanvas { max-width: 100%; height: auto; }
+  .container {
+    padding: 10px;
+  }
+
+  .header-frame h1 {
+    font-size: 20px;
+  }
+
+  .game-mode {
+    font-size: 12px;
+  }
+
+  .canvas-container {
+    padding: 8px;
+  }
+
+  .chain-display {
+    font-size: 20px;
+    top: 15px;
+    right: 15px;
+  }
+
+  .aiming-character {
+    width: 50px;
+    height: 50px;
+  }
+
+  .recipe-items {
+    gap: 6px;
+  }
+
+  .recipe-item img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stock-item {
+    width: 38px;
+    height: 38px;
+    font-size: 24px;
+  }
+
+  .btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 480px) {
-  .container { padding: 12px; }
-  header h1 { font-size: 24px; }
-  .button-group { flex-direction: column; gap: 8px; }
-  .btn { padding: 14px; font-size: 14px; }
-  .stock-items { gap: 6px; }
-  .stock-item { width: 40px; height: 40px; font-size: 24px; }
+  .container {
+    padding: 8px;
+  }
+
+  .header-frame h1 {
+    font-size: 18px;
+  }
+
+  .frame-inner {
+    padding: 10px 12px;
+  }
+
+  .score-frame .frame-inner {
+    font-size: 12px;
+  }
+
+  .score-frame .frame-inner b {
+    font-size: 14px;
+  }
+
+  .recipe-items {
+    gap: 4px;
+    padding: 6px 2px;
+  }
+
+  .recipe-item img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .recipe-item .arrow {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+
+  .stock-items {
+    gap: 6px;
+  }
+
+  .stock-item {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 }
