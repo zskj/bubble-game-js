@@ -1,66 +1,67 @@
-import { NORMAL_MONOS } from './monos.js';
-import { DropAndFusionGame } from './game.js';
-import { GameRenderer } from './renderer.js';
-import { InputHandler } from './input-handler.js';
-
-// 初始化
-const canvas = document.getElementById('gameCanvas');
-const scoreEl = document.getElementById('score');
-const comboEl = document.getElementById('combo');
-const stockDisplayEl = document.getElementById('stockDisplay');
-const gameOverModal = document.getElementById('gameOverModal');
-const finalScoreEl = document.getElementById('finalScore');
-const maxComboEl = document.getElementById('maxCombo');
-
-const game = new DropAndFusionGame({ seed: Date.now().toString() });
-const renderer = new GameRenderer(canvas);
-const inputHandler = new InputHandler(canvas, game);
-
-let maxCombo = 0;
-
-// 事件绑定
-game.addEventListener('changeScore', (e) => {
-  scoreEl.textContent = e.detail.score;
-});
-
-game.addEventListener('changeCombo', (e) => {
-  comboEl.textContent = e.detail.combo;
-  if (e.detail.combo > maxCombo) {
-    maxCombo = e.detail.combo;
+(function () {
+  if (!window.Matter) {
+    alert('依赖 Matter.js 未加载：请检查网络是否可用（本项目通过 CDN 加载依赖）。');
+    return;
   }
-});
 
-game.addEventListener('changeStock', (e) => {
-  updateStockDisplay(e.detail.stock);
-});
+  const DropAndFusionGame = window.DropAndFusionGame;
+  const GameRenderer = window.GameRenderer;
+  const InputHandler = window.InputHandler;
 
-game.addEventListener('gameOver', () => {
-  finalScoreEl.textContent = game.score;
-  maxComboEl.textContent = maxCombo;
-  gameOverModal.classList.remove('hidden');
-});
+  const canvas = document.getElementById('gameCanvas');
+  const scoreEl = document.getElementById('score');
+  const comboEl = document.getElementById('combo');
+  const stockDisplayEl = document.getElementById('stockDisplay');
+  const gameOverModal = document.getElementById('gameOverModal');
+  const finalScoreEl = document.getElementById('finalScore');
+  const maxComboEl = document.getElementById('maxCombo');
 
-function updateStockDisplay(stock) {
-  stockDisplayEl.innerHTML = '';
-  stock.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'stock-item';
-    div.textContent = item.mono.emoji;
-    stockDisplayEl.appendChild(div);
+  const game = new DropAndFusionGame({ seed: Date.now().toString() });
+  const renderer = new GameRenderer(canvas);
+  new InputHandler(canvas, game);
+
+  let maxCombo = 0;
+
+  game.addEventListener('changeScore', (e) => {
+    scoreEl.textContent = e.detail.score;
   });
-}
 
-// 游戏循环
-function gameLoop() {
-  if (game.tick()) {
-    renderer.render(game.engine, game.monoDefinitions);
-    requestAnimationFrame(gameLoop);
-  } else {
-    // Game over is handled by event
-    renderer.render(game.engine, game.monoDefinitions);
+  game.addEventListener('changeCombo', (e) => {
+    comboEl.textContent = e.detail.combo;
+    if (e.detail.combo > maxCombo) {
+      maxCombo = e.detail.combo;
+    }
+  });
+
+  game.addEventListener('changeStock', (e) => {
+    updateStockDisplay(e.detail.stock);
+  });
+
+  game.addEventListener('gameOver', () => {
+    finalScoreEl.textContent = game.score;
+    maxComboEl.textContent = maxCombo;
+    gameOverModal.classList.remove('hidden');
+  });
+
+  function updateStockDisplay(stock) {
+    stockDisplayEl.innerHTML = '';
+    stock.forEach((item) => {
+      const div = document.createElement('div');
+      div.className = 'stock-item';
+      div.textContent = item.mono.emoji;
+      stockDisplayEl.appendChild(div);
+    });
   }
-}
 
-// 启动
-game.start();
-gameLoop();
+  function gameLoop() {
+    if (game.tick()) {
+      renderer.render(game.engine);
+      requestAnimationFrame(gameLoop);
+    } else {
+      renderer.render(game.engine);
+    }
+  }
+
+  game.start();
+  gameLoop();
+})();
