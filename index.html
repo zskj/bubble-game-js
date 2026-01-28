@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="纯前端泡泡游戏，支持手机端游玩">
+    <meta name="keywords" content="泡泡游戏,Emoji,合成游戏,手机游戏">
+    <title>🫧 泡泡游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🫧 泡泡游戏</h1>
+            <p class="subtitle">对准位置投入 Emoji，相同的合成后获得分数</p>
+        </header>
+
+        <div class="game-wrapper">
+            <!-- 分数显示栏 -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <label>分数</label>
+                    <span id="score" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>连击</label>
+                    <span id="combo" class="stat-value">0</span>
+                </div>
+            </div>
+
+            <!-- Canvas 游戏区 -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="450" height="600"></canvas>
+            </div>
+
+            <!-- 游戏控制区 -->
+            <div class="controls-section">
+                <!-- 预览区 -->
+                <div class="preview-area">
+                    <label class="preview-label">下一个:</label>
+                    <div id="stockDisplay" class="stock-items">
+                        <div class="stock-item">🍎</div>
+                        <div class="stock-item">🍊</div>
+                        <div class="stock-item">🍋</div>
+                        <div class="stock-item">🍌</div>
+                    </div>
+                </div>
+
+                <!-- 操作区 -->
+                <div class="actions-area">
+                    <div class="position-selector">
+                        <label for="xSlider">位置:</label>
+                        <input id="xSlider" type="range" min="25" max="425" value="225" class="drop-slider">
+                        <span id="xValue" class="x-value">225</span>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="dropBtn" class="btn btn-primary">投放</button>
+                        <button id="holdBtn" class="btn btn-secondary">Hold</button>
+                        <button id="restartBtn" class="btn btn-danger">重新开始</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h2>游戏结束!</h2>
+            <div class="game-over-stats">
+                <p><label>最终分数:</label> <strong id="finalScore">0</strong></p>
+                <p><label>最高连击:</label> <strong id="maxCombo">0</strong></p>
+            </div>
+            <button id="modalRestartBtn" class="btn btn-primary btn-large">再来一局</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
