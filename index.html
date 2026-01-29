@@ -27,23 +27,19 @@
                     <canvas id="gameCanvas" width="450" height="600"></canvas>
                     <div id="chainDisplay" class="chain-display">0 Chain!</div>
                     <div id="aimingIndicator" class="aiming-indicator">
+                        <div id="aimingEmoji" class="aiming-emoji"></div>
                         <div class="aiming-character"></div>
                         <div class="aiming-triangle"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 分数和设置 -->
+            <!-- 分数 -->
             <div class="score-settings-row">
                 <div class="score-frame">
                     <div class="frame-inner">
                         <div>得分: <span id="score">0</span>pt</div>
                         <div>最高分: <b><span id="highScore">0</span>pt</b></div>
-                    </div>
-                </div>
-                <div class="settings-frame">
-                    <div class="frame-inner">
-                        <div><i class="ti ti-settings"></i></div>
                     </div>
                 </div>
             </div>
@@ -58,30 +54,15 @@
 
             <!-- 控制区 -->
             <div class="controls-section">
-                <!-- 下一个道具 -->
-                <div class="stock-frame">
-                    <div class="frame-inner stock-inner">
-                        <div id="stockDisplay" class="stock-items"></div>
-                    </div>
-                </div>
-
-                <!-- 操作按钮 -->
-                <div class="button-frame">
-                    <div class="frame-inner">
+                <div class="grab-row">
+                    <div class="frame-inner grab-button-inner">
                         <button id="dropBtn" class="btn btn-catch">
                             <div class="btn-icon"></div>
                             <div class="btn-text">抓住</div>
                         </button>
                     </div>
-                </div>
-
-                <!-- Hold/取消按钮 -->
-                <div class="hold-frame">
-                    <div class="frame-inner">
-                        <button id="holdBtn" class="btn btn-cancel">
-                            <div class="btn-icon"></div>
-                            <div class="btn-text">取消</div>
-                        </button>
+                    <div class="frame-inner grab-next-inner">
+                        <div id="nextDropDisplay" class="next-drop-items"></div>
                     </div>
                 </div>
             </div>
