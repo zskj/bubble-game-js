@@ -71,6 +71,7 @@
       this.combo = 0;
       this.stock = [];
       this.holding = null;
+      this.fallingMonoBody = null;
       this.gameOver = false;
       this.latestDroppedAt = -DROP_COOLTIME;
       this.rng = createRng(options.seed || Date.now().toString());
@@ -180,6 +181,10 @@
           const newMono = this.createMonoBody(newX, newY, nextMonoDef);
           Matter.Composite.add(this.engine.world, newMono);
 
+          if (this.fallingMonoBody === bodyA || this.fallingMonoBody === bodyB) {
+            this.fallingMonoBody = newMono;
+          }
+
           this.updateScore(nextMonoDef.score);
           this.updateCombo();
 
@@ -225,6 +230,14 @@
       this.frame++;
       Matter.Engine.update(this.engine, TICK_DELTA);
 
+      if (
+        this.fallingMonoBody &&
+        (this.fallingMonoBody.hasTouchedGround ||
+          !this.engine.world.bodies.includes(this.fallingMonoBody))
+      ) {
+        this.fallingMonoBody = null;
+      }
+
       if (this.frame - this.lastFusionAt >= COMBO_INTERVAL && this.combo > 0) {
         this.combo = 0;
         this.dispatchEvent(
@@ -257,6 +270,7 @@
 
       Matter.Composite.add(this.engine.world, body);
       this.latestDroppedAt = this.frame;
+      this.fallingMonoBody = body;
 
       this.stock.push(this.getRandomMono());
       this.dispatchEvent(
@@ -271,19 +285,47 @@
     }
 
     hold() {
+      if (this.gameOver) return;
+
+      const target = this.fallingMonoBody;
+      if (!target || target.hasTouchedGround) return;
+
+      const currentMonoDef = target.monoData;
+      const position = { x: target.position.x, y: target.position.y };
+      const velocity = { x: target.velocity.x, y: target.velocity.y };
+      const angle = target.angle;
+      const angularVelocity = target.angularVelocity;
+
+      Matter.Composite.remove(this.engine.world, target);
+
       if (this.holding === null) {
-        this.holding = this.stock.shift();
-        this.stock.push(this.getRandomMono());
+        this.holding = {
+          id: Math.random().toString(36).substr(2, 9),
+          mono: currentMonoDef
+        };
+        this.fallingMonoBody = null;
       } else {
-        const temp = this.holding;
-        this.holding = this.stock[0];
-        this.stock[0] = temp;
+        const held = this.holding;
+        this.holding = {
+          id: Math.random().toString(36).substr(2, 9),
+          mono: currentMonoDef
+        };
+
+        const newBody = this.createMonoBody(position.x, position.y, held.mono);
+        Matter.Body.setVelocity(newBody, velocity);
+        Matter.Body.setAngle(newBody, angle);
+        Matter.Body.setAngularVelocity(newBody, angularVelocity);
+
+        Matter.Composite.add(this.engine.world, newBody);
+        this.fallingMonoBody = newBody;
+
+        this.dispatchEvent(
+          new CustomEvent('monoAdded', { detail: { mono: newBody } })
+        );
       }
+
       this.dispatchEvent(
         new CustomEvent('changeHolding', { detail: { holding: this.holding } })
-      );
-      this.dispatchEvent(
-        new CustomEvent('changeStock', { detail: { stock: this.stock } })
       );
     }
 
