@@ -13,7 +13,6 @@
   const scoreEl = document.getElementById('score');
   const highScoreEl = document.getElementById('highScore');
   const nextDropDisplayEl = document.getElementById('nextDropDisplay');
-  const aimingEmojiEl = document.getElementById('aimingEmoji');
   const gameOverModal = document.getElementById('gameOverModal');
   const finalScoreEl = document.getElementById('finalScore');
   const maxComboEl = document.getElementById('maxCombo');
@@ -100,37 +99,39 @@
     updateDropPreview(e.detail.stock);
   });
 
+  game.addEventListener('changeHolding', (e) => {
+    updateHoldingPreview(e.detail.holding);
+  });
+
   game.addEventListener('gameOver', () => {
     finalScoreEl.textContent = game.score.toLocaleString();
     maxComboEl.textContent = maxCombo;
     gameOverModal.classList.remove('hidden');
   });
 
+  function updateHoldingPreview(holding) {
+    if (!dropBtnIconEl) return;
+    dropBtnIconEl.textContent = holding?.mono?.emoji || '';
+  }
+
   function updateDropPreview(stock) {
-    const currentEmoji = stock[0]?.mono?.emoji || '';
-
-    if (dropBtnIconEl) {
-      dropBtnIconEl.textContent = currentEmoji;
-    }
-
-    if (aimingEmojiEl) {
-      aimingEmojiEl.textContent = currentEmoji;
-    }
-
     if (!nextDropDisplayEl) return;
 
     nextDropDisplayEl.innerHTML = '';
-    stock.slice(1, 4).forEach((item) => {
+    stock.slice(0, 4).forEach((item, index) => {
       const span = document.createElement('span');
-      span.className = 'next-drop-item';
+      span.className = `next-drop-item${index === 0 ? ' is-current' : ''}`;
       span.textContent = item.mono.emoji;
       nextDropDisplayEl.appendChild(span);
     });
   }
 
-  // Drop button handler
+  updateHoldingPreview(game.holding);
+
+  // 抓住按钮（Hold / Swap）
   dropBtn.addEventListener('click', () => {
-    game.drop(canvas.width / 2);
+    if (game.gameOver) return;
+    game.hold();
   });
 
 

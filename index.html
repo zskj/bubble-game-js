@@ -12,11 +12,28 @@
 <body>
     <div class="container">
         <div class="game-wrapper">
-            <!-- 标题 -->
-            <div class="header-frame">
-                <div class="frame-inner">
-                    <h1>泡泡游戏</h1>
-                    <div class="game-mode">- NORMAL -</div>
+            <!-- 顶部栏：一行三栏（标题 / 抓住 / 将要投放） -->
+            <div class="top-bar">
+                <div class="header-frame">
+                    <div class="frame-inner">
+                        <h1>泡泡游戏</h1>
+                        <div class="game-mode">- NORMAL -</div>
+                    </div>
+                </div>
+
+                <div class="hold-frame">
+                    <div class="frame-inner grab-button-inner">
+                        <button id="dropBtn" class="btn btn-catch btn-topbar">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">抓住</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="next-frame">
+                    <div class="frame-inner grab-next-inner">
+                        <div id="nextDropDisplay" class="next-drop-items"></div>
+                    </div>
                 </div>
             </div>
 
@@ -27,8 +44,6 @@
                     <canvas id="gameCanvas" width="450" height="600"></canvas>
                     <div id="chainDisplay" class="chain-display">0 Chain!</div>
                     <div id="aimingIndicator" class="aiming-indicator">
-                        <div id="aimingEmoji" class="aiming-emoji"></div>
-                        <div class="aiming-character"></div>
                         <div class="aiming-triangle"></div>
                     </div>
                 </div>
@@ -52,20 +67,7 @@
                 </div>
             </div>
 
-            <!-- 控制区 -->
-            <div class="controls-section">
-                <div class="grab-row">
-                    <div class="frame-inner grab-button-inner">
-                        <button id="dropBtn" class="btn btn-catch">
-                            <div class="btn-icon"></div>
-                            <div class="btn-text">抓住</div>
-                        </button>
-                    </div>
-                    <div class="frame-inner grab-next-inner">
-                        <div id="nextDropDisplay" class="next-drop-items"></div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 
