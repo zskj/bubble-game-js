@@ -12,7 +12,8 @@
   const canvas = document.getElementById('gameCanvas');
   const scoreEl = document.getElementById('score');
   const highScoreEl = document.getElementById('highScore');
-  const stockDisplayEl = document.getElementById('stockDisplay');
+  const nextDropDisplayEl = document.getElementById('nextDropDisplay');
+  const aimingEmojiEl = document.getElementById('aimingEmoji');
   const gameOverModal = document.getElementById('gameOverModal');
   const finalScoreEl = document.getElementById('finalScore');
   const maxComboEl = document.getElementById('maxCombo');
@@ -20,8 +21,8 @@
   const fusionRecipeEl = document.getElementById('fusionRecipe');
   const aimingIndicatorEl = document.getElementById('aimingIndicator');
   const dropBtn = document.getElementById('dropBtn');
-  const holdBtn = document.getElementById('holdBtn');
   const modalRestartBtn = document.getElementById('modalRestartBtn');
+  const dropBtnIconEl = dropBtn ? dropBtn.querySelector('.btn-icon') : null;
 
   // Load high score from localStorage
   let highScore = parseInt(localStorage.getItem('bubbleGameHighScore') || '0');
@@ -96,7 +97,7 @@
   });
 
   game.addEventListener('changeStock', (e) => {
-    updateStockDisplay(e.detail.stock);
+    updateDropPreview(e.detail.stock);
   });
 
   game.addEventListener('gameOver', () => {
@@ -105,27 +106,33 @@
     gameOverModal.classList.remove('hidden');
   });
 
-  function updateStockDisplay(stock) {
-    stockDisplayEl.innerHTML = '';
-    stock.forEach((item) => {
-      const div = document.createElement('div');
-      div.className = 'stock-item';
-      div.textContent = item.mono.emoji;
-      stockDisplayEl.appendChild(div);
+  function updateDropPreview(stock) {
+    const currentEmoji = stock[0]?.mono?.emoji || '';
+
+    if (dropBtnIconEl) {
+      dropBtnIconEl.textContent = currentEmoji;
+    }
+
+    if (aimingEmojiEl) {
+      aimingEmojiEl.textContent = currentEmoji;
+    }
+
+    if (!nextDropDisplayEl) return;
+
+    nextDropDisplayEl.innerHTML = '';
+    stock.slice(1, 4).forEach((item) => {
+      const span = document.createElement('span');
+      span.className = 'next-drop-item';
+      span.textContent = item.mono.emoji;
+      nextDropDisplayEl.appendChild(span);
     });
   }
 
   // Drop button handler
   dropBtn.addEventListener('click', () => {
-    const canvasRect = canvas.getBoundingClientRect();
-    const x = canvasRect.width / 2;
-    game.drop(x);
+    game.drop(canvas.width / 2);
   });
 
-  // Hold button handler
-  holdBtn.addEventListener('click', () => {
-    game.hold();
-  });
 
   // Restart button in modal
   modalRestartBtn.addEventListener('click', () => {
