@@ -19,6 +19,7 @@
   const chainDisplayEl = document.getElementById('chainDisplay');
   const fusionRecipeEl = document.getElementById('fusionRecipe');
   const aimingIndicatorEl = document.getElementById('aimingIndicator');
+  const currentDropDisplayEl = document.getElementById('currentDropDisplay');
   const dropBtn = document.getElementById('dropBtn');
   const modalRestartBtn = document.getElementById('modalRestartBtn');
   const dropBtnIconEl = dropBtn ? dropBtn.querySelector('.btn-icon') : null;
@@ -97,10 +98,12 @@
 
   game.addEventListener('changeStock', (e) => {
     updateDropPreview(e.detail.stock);
+    updateCurrentDropDisplay();
   });
 
   game.addEventListener('changeHolding', (e) => {
     updateHoldingPreview(e.detail.holding);
+    updateCurrentDropDisplay();
   });
 
   game.addEventListener('gameOver', () => {
@@ -118,7 +121,8 @@
     if (!nextDropDisplayEl) return;
 
     nextDropDisplayEl.innerHTML = '';
-    stock.slice(0, 4).forEach((item, index) => {
+    // 显示3个（包含当前要下落的 stock[0]）
+    stock.slice(0, 3).forEach((item, index) => {
       const span = document.createElement('span');
       span.className = `next-drop-item${index === 0 ? ' is-current' : ''}`;
       span.textContent = item.mono.emoji;
@@ -126,12 +130,44 @@
     });
   }
 
+  function updateCurrentDropDisplay() {
+    if (!currentDropDisplayEl) return;
+
+    const currentMono = game.getCurrentMono();
+    if (currentMono) {
+      currentDropDisplayEl.textContent = currentMono.mono.emoji;
+    } else {
+      currentDropDisplayEl.textContent = '';
+    }
+  }
+
   updateHoldingPreview(game.holding);
+  updateCurrentDropDisplay();
 
   // 抓住按钮（Hold / Swap）
   dropBtn.addEventListener('click', () => {
     if (game.gameOver) return;
-    game.hold();
+
+    // 如果有正在下落的物体，不执行抓住操作
+    if (game.fallingMonoBody) return;
+
+    // 如果暂存为空，把当前要下落的放到暂存，顺位下一个变成要下落的emoji
+    if (game.holding === null) {
+      game.holding = game.stock.shift(); // 把当前要下落的放到暂存
+      game.addRandomMono(); // 重新生成一个
+    } else {
+      // 如果暂存里面有emoji，交换暂存和当前要下落的emoji
+      const held = game.holding;
+      const current = game.stock.shift(); // 获取当前要下落的
+
+      game.holding = current; // 当前要下落的放到暂存
+      game.stock.unshift(held); // 暂存的放到 stock 第一个位置
+    }
+
+    // 更新 UI
+    updateHoldingPreview(game.holding);
+    updateDropPreview(game.stock);
+    updateCurrentDropDisplay();
   });
 
 

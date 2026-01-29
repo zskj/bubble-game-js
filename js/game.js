@@ -140,6 +140,19 @@
       return { id: Math.random().toString(36).substr(2, 9), mono: mono };
     }
 
+    getCurrentMono() {
+      return this.stock.length > 0 ? this.stock[0] : null;
+    }
+
+    addRandomMono() {
+      const randomMono = this.getRandomMono();
+      this.stock.push(randomMono);
+      this.dispatchEvent(
+        new CustomEvent('changeStock', { detail: { stock: this.stock } })
+      );
+      return randomMono;
+    }
+
     handleCollision(pair) {
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
@@ -296,21 +309,34 @@
       const angle = target.angle;
       const angularVelocity = target.angularVelocity;
 
-      Matter.Composite.remove(this.engine.world, target);
-
+      // 如果暂存为空，把当前要下落的放到暂存，stock 移除第一个，重新生成一个
       if (this.holding === null) {
-        this.holding = {
-          id: Math.random().toString(36).substr(2, 9),
-          mono: currentMonoDef
-        };
-        this.fallingMonoBody = null;
-      } else {
-        const held = this.holding;
-        this.holding = {
-          id: Math.random().toString(36).substr(2, 9),
-          mono: currentMonoDef
-        };
+        this.holding = this.stock.shift(); // 把当前要下落的放到暂存
+        this.stock.push(this.getRandomMono()); // 重新生成一个
 
+        // 移除物理世界中的下落物体
+        Matter.Composite.remove(this.engine.world, target);
+        this.fallingMonoBody = null;
+
+        this.dispatchEvent(
+          new CustomEvent('changeHolding', { detail: { holding: this.holding } })
+        );
+        this.dispatchEvent(
+          new CustomEvent('changeStock', { detail: { stock: this.stock } })
+        );
+      } else {
+        // 如果暂存有值，交换暂存和 stock[0]
+        const held = this.holding;
+        const next = this.stock.shift(); // 获取当前要下落的
+
+        // 交换：暂存 <-- 当前要下落的
+        this.holding = next;
+
+        // 把暂存的放到 stock 的第一个位置
+        this.stock.unshift(held);
+
+        // 更新物理世界中的物体为暂存的 emoji
+        Matter.Composite.remove(this.engine.world, target);
         const newBody = this.createMonoBody(position.x, position.y, held.mono);
         Matter.Body.setVelocity(newBody, velocity);
         Matter.Body.setAngle(newBody, angle);
@@ -320,13 +346,15 @@
         this.fallingMonoBody = newBody;
 
         this.dispatchEvent(
+          new CustomEvent('changeHolding', { detail: { holding: this.holding } })
+        );
+        this.dispatchEvent(
+          new CustomEvent('changeStock', { detail: { stock: this.stock } })
+        );
+        this.dispatchEvent(
           new CustomEvent('monoAdded', { detail: { mono: newBody } })
         );
       }
-
-      this.dispatchEvent(
-        new CustomEvent('changeHolding', { detail: { holding: this.holding } })
-      );
     }
 
     createMonoBody(x, y, monoDef) {

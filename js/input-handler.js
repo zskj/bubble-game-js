@@ -33,24 +33,6 @@
         { passive: false }
       );
 
-      const xSlider = document.getElementById('xSlider');
-      const xValueDisplay = document.getElementById('xValue');
-      if (xSlider) {
-        xSlider.addEventListener('input', (e) => {
-          if (xValueDisplay) xValueDisplay.textContent = e.target.value;
-        });
-      }
-
-      const dropBtn = document.getElementById('dropBtn');
-      if (dropBtn) {
-        dropBtn.addEventListener('click', () => {
-          if (game.gameOver) return;
-          if (!xSlider) return;
-          const x = parseFloat(xSlider.value);
-          game.drop(x);
-        });
-      }
-
       const holdBtn = document.getElementById('holdBtn');
       if (holdBtn) {
         holdBtn.addEventListener('click', () => {
