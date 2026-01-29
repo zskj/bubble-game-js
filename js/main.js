@@ -170,6 +170,32 @@
     updateCurrentDropDisplay();
   });
 
+  dropBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (game.gameOver) return;
+
+    // 如果有正在下落的物体，不执行抓住操作
+    if (game.fallingMonoBody) return;
+
+    // 如果暂存为空，把当前要下落的放到暂存，顺位下一个变成要下落的emoji
+    if (game.holding === null) {
+      game.holding = game.stock.shift(); // 把当前要下落的放到暂存
+      game.addRandomMono(); // 重新生成一个
+    } else {
+      // 如果暂存里面有emoji，交换暂存和当前要下落的emoji
+      const held = game.holding;
+      const current = game.stock.shift(); // 获取当前要下落的
+
+      game.holding = current; // 当前要下落的放到暂存
+      game.stock.unshift(held); // 暂存的放到 stock 第一个位置
+    }
+
+    // 更新 UI
+    updateHoldingPreview(game.holding);
+    updateDropPreview(game.stock);
+    updateCurrentDropDisplay();
+  });
+
 
   // Restart button in modal
   modalRestartBtn.addEventListener('click', () => {
@@ -192,32 +218,25 @@
     chainDisplayEl.style.display = 'none';
   });
 
-  // Update aiming indicator position based on mouse/touch
-  function updateAimingIndicator(x) {
-    const canvasRect = canvas.getBoundingClientRect();
-    const normalizedX = (x - canvasRect.left) / canvasRect.width;
-    const clampedX = Math.max(0.1, Math.min(0.9, normalizedX));
-
-    // Move the aiming indicator
-    aimingIndicatorEl.style.left = `${clampedX * 100}%`;
-  }
-
-  // Listen for mouse/touch movement on canvas
-  canvas.addEventListener('mousemove', (e) => {
-    updateAimingIndicator(e.clientX);
-  });
-
-  canvas.addEventListener('touchmove', (e) => {
+  modalRestartBtn.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    const touch = e.touches[0];
-    updateAimingIndicator(touch.clientX);
-  });
+    gameOverModal.classList.add('hidden');
+    game.dispose();
 
-  // Click/tap to drop at position
-  canvas.addEventListener('click', (e) => {
-    const canvasRect = canvas.getBoundingClientRect();
-    const x = e.clientX - canvasRect.left;
-    game.drop(x);
+    // Reset max combo
+    maxCombo = 0;
+
+    // Create new game
+    const newGame = new DropAndFusionGame({ seed: Date.now().toString() });
+
+    // Copy all properties and event listeners
+    Object.assign(game, newGame);
+
+    // Re-attach event listeners
+    game.start();
+
+    // Hide chain display
+    chainDisplayEl.style.display = 'none';
   });
 
   // Hide chain display after 2 seconds
